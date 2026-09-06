@@ -1,59 +1,154 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LetsQuiz System Documentation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 1. System Overview
 
-## About Laravel
+LetsQuiz is a web application for creating, managing, publishing, and taking study quizzes. A signed-in user can create quiz decks, add flash cards, configure quiz modes, publish decks for public access, and record quiz attempts.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The application uses a Laravel backend with an Inertia.js React frontend. Laravel provides routing, authentication, validation, database access, sessions, mail, and integrations with external APIs. React provides the interactive pages and quiz experience.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 2. Languages and Frameworks
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Backend
 
-## Learning Laravel
+- PHP 8.2 or newer
+- Laravel 12
+- Laravel Eloquent ORM
+- Laravel Blade for the application shell
+- Inertia.js Laravel adapter
+- PHPUnit for automated tests
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Frontend
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- TypeScript
+- React 18
+- Inertia.js React adapter
+- Vite 7
+- Tailwind CSS
+- Headless UI React
+- Lucide React icons
+- Axios
 
-## Laravel Sponsors
+### Data and infrastructure
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- MySQL or SQLite through Laravel's database layer
+- Database-backed sessions, cache, and queues by default
+- Vite for frontend development and production builds
+- Composer for PHP dependencies
+- npm for JavaScript dependencies
 
-### Premium Partners
+## 3. Main Features
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### User accounts
 
-## Contributing
+- Register and log in with an email address and password.
+- Log out securely and invalidate the session.
+- Reset a forgotten password.
+- Verify an email address when mail delivery is configured.
+- Confirm the current password for protected account actions.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Quiz deck management
 
-## Code of Conduct
+- Create quiz decks with a title and optional image.
+- Edit and delete owned decks.
+- Publish or unpublish a deck.
+- Set a passing percentage.
+- Enable multiple-answer, fill-in-the-blank, and swipe quiz modes.
+- View the user's decks from the dashboard.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Flash card management
 
-## Security Vulnerabilities
+- Add flash cards to a deck.
+- Edit and delete flash cards.
+- Store an optional card title, question, answer, and image.
+- Open a deck in a play mode for taking the quiz.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Quiz attempts and results
 
-## License
+- Take quizzes from available decks.
+- Submit an attempt for a deck.
+- Store the score and completion time.
+- Use deck settings to determine the available quiz modes and passing threshold.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Public decks
+
+- Mark a deck as public.
+- Display public quiz content through the public quiz experience.
+
+### External services
+
+- Cloudinary stores uploaded deck and flash-card images when its credentials are configured.
+- Brevo can add newly registered users to a contact list.
+- Laravel mail sends the account-created email. The default local configuration writes mail to the application log instead of sending it externally.
+
+> Cloudflare is not currently used by this application. Configuring Cloudflare API credentials alone will not enable image uploads. The implemented image provider is Cloudinary.
+
+## 4. How the System Works
+
+1. A visitor opens the landing page and can register or log in.
+2. Laravel authenticates the user and starts a session.
+3. The dashboard loads the user's quiz decks through an Inertia response.
+4. Deck and card forms submit to Laravel routes using POST, PATCH, and DELETE requests.
+5. Laravel validates the request, checks ownership, writes the data through Eloquent, and redirects back to an Inertia page.
+6. Uploaded images are signed and sent to Cloudinary. If Cloudinary credentials are missing, the application stores the file on the local public filesystem instead.
+7. A quiz submission creates a `quiz_attempts` record containing the user, deck, score, and timestamp.
+
+## 5. Important Routes
+
+| Area | Routes |
+| --- | --- |
+| Landing | `/` |
+| Authentication | `/register`, `/login`, `/forgot-password`, `/logout` |
+| Dashboard | `/dashboard`, `/home` |
+| Decks | `/quiz-decks` |
+| Deck cards | `/quiz-decks/{quizDeck}/cards` |
+| Play quiz | `/quiz-decks/{quizDeck}/play` |
+| Attempts | `/quiz-decks/{quizDeck}/attempts` |
+
+Most deck, card, and attempt routes require authentication. Ownership checks prevent a user from changing another user's private content.
+
+## 6. Data Model
+
+- `users`: application accounts and optional Google-related fields retained by the user model.
+- `quiz_decks`: deck owner, title, image path, visibility, passing percentage, and enabled quiz modes.
+- `flash_cards`: card owner, deck, title, image path, question, and answer.
+- `quiz_attempts`: deck, user, score, time taken, and quiz statistics.
+- `sessions`, `cache`, and `jobs`: Laravel infrastructure tables when database-backed drivers are enabled.
+
+## 7. Dependencies
+
+### PHP dependencies
+
+The main PHP dependencies are defined in `composer.json`:
+
+- `laravel/framework`
+- `inertiajs/inertia-laravel`
+- `laravel/sanctum`
+- `laravel/socialite`
+- `laravel/tinker`
+- `tightenco/ziggy`
+- `fakerphp/faker` for development data
+- `phpunit/phpunit` for tests
+- `laravel/breeze` for authentication scaffolding
+- `laravel/pint` for code style
+
+### JavaScript dependencies
+
+The frontend dependencies are defined in `package.json`:
+
+- `react`, `react-dom`
+- `@inertiajs/react`
+- `@headlessui/react`
+- `tailwindcss`, `@tailwindcss/forms`
+- `lucide-react`
+- `axios`
+- `vite`, `laravel-vite-plugin`, `@vitejs/plugin-react`
+- `typescript`
+- `concurrently`
+
+## 8. Operational Notes
+
+- Never commit `.env` or API secrets.
+- Run migrations after pulling new migration files.
+- Clear Laravel configuration cache after changing environment variables.
+- Run the production frontend build before serving the application without a Vite development server.
+- Review `storage/logs/laravel.log` when an external API or mail operation fails.
